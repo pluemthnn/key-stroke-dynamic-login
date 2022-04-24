@@ -113,7 +113,9 @@ function App() {
   console.log(user);
 
   return (
-    <div className="App">
+    <div className="App" style={{backgroundColor: "lightsteelblue"}}>
+      <div className="bg-lightslategray h-screen font-sans">
+        <div className="container mx-auto h-full flex justify-center items-center">
       <Router>
         <Switch>
           <Route exact path="/">
@@ -126,7 +128,8 @@ function App() {
         </Switch>
 
       </Router>
-
+      </div>
+    </div>
     </div>
   );
 }
