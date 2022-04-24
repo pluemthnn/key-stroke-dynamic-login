@@ -2,16 +2,12 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import { useHistory } from "react-router-dom"
 
-const Login = ({ useSetLoginUser }) => {
+const Login = () => {
     const history = useHistory()
     const [user, setUser] = useState({
         username: "",
         password: "",
         userbiokey: -1
-    })
-
-    const [state, setState] = useState({
-        currText: "",
     })
 
     const [keyevent, setkeyevent] = useState({
@@ -20,10 +16,6 @@ const Login = ({ useSetLoginUser }) => {
         DD: [], //type speed
     })
 
-
-    var kevents = []; // รับ event ทั้ง keyup-keydown
-    var keyupevents = [];
-    var keydownevents = [];
     var lastup = -1;
     var lastdown= -1;
 
@@ -44,15 +36,11 @@ const Login = ({ useSetLoginUser }) => {
             [key]: value,
         })
     }
-    
+
     const captureKeyEvent = (e) => {
-        kevents.push(e);
-        console.log('captureKeyEvent -> e', e.type, "key ", e.key);
 
         if (e.key.length > 1) { // special key
             if (e.key === "Backspace") {
-                // handleSetState("currText", "")
-                state.currText = ""
                 handleSetkeyevent("DU", []) // reset dwel time
                 handleSetkeyevent("UD", []) // reset flight time
                 handleSetkeyevent("DD", []) // reset type speed
@@ -61,7 +49,6 @@ const Login = ({ useSetLoginUser }) => {
         }
 
         if (e.type === "keydown") {
-            state.currText = e.key
             if (lastup >= 0) {
                 const flight = e.timeStamp - lastup
                 keyevent.UD.push(flight)// set flight time
@@ -74,7 +61,6 @@ const Login = ({ useSetLoginUser }) => {
             }
             lastdown = e.timeStamp
             console.log("lastdown ", lastdown);
-            keydownevents.push(lastdown);
         } else {
             if (lastdown >= 0) {
                 const dwel = e.timeStamp - lastdown
@@ -83,7 +69,6 @@ const Login = ({ useSetLoginUser }) => {
             lastup = e.timeStamp // set lastup value
             console.log("lastup ", lastup);
             console.log("Dwell ", keyevent.DU, "key ", e.key);
-            keyupevents.push(e.timeStamp);
         };
 
     }
@@ -96,10 +81,28 @@ const Login = ({ useSetLoginUser }) => {
 
     }, []);
 
-    async function handlelogin(e) {
+    const handleRegister = async(e) => {
+        e.preventDefault()
+        try {
+            await axios.post("http://localhost:3001/login", user).then((res) => {
+            var user = res.data;
+            alert(`hello ${user.name}`);
+            console.log({ user });
+            history.push("/")
+        })
+        }catch(err) {
+            if (axios.isAxiosError(err)) {
+                console.log({err});
+                alert(err.response.data.message);
+                history.push("/")
+            }
+        }
+    }
+
+    function handlelogin(e) {
         e.preventDefault()
 
-        let sum = keyevent.DU[keyevent.DU.length - 1];
+        let sum = keyevent.DU[keyevent.DU.length - 1];// dwel time
 
         for (let i = 0; i < keyevent.DD.length; i++) {
             sum += keyevent.DD[i];
@@ -107,19 +110,8 @@ const Login = ({ useSetLoginUser }) => {
         let n = keyevent.DD.length + 1
         user.userbiokey = sum / n
 
-        console.log(user.userbiokey);
-
-        await axios.post("http://localhost:3001/login", user).then(res => {
-            var user = res.data.name;
-            alert(user);
-            console.log({ user });
-            SetData(res.data)
-        })
-    }
-
-    function SetData(user) {
-        // useSetLoginUser(user)
-        history.push("/")
+        console.log("user.userbiokey ", user.userbiokey);
+        handleRegister(e)
     }
 
     return (

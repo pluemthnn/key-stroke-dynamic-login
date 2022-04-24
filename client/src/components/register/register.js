@@ -6,12 +6,13 @@ const Register = () => {
         name: "",
         username: "",
         password: "",
-        userbiokey: 200
+        userbiokey: 200,
+        Threshold: null,
     })
 
     const handleChange = (key, e) => {
         var value = e
-        if (key !== "userbiokey") {
+        if (key !== "userbiokey" && key !== "Threshold") {
             value = e.target.value
         }
         setUser({
@@ -20,18 +21,32 @@ const Register = () => {
         })
     }
 
-    //register function 
-    const handleRegister = (e) => {
-        e.preventDefault()
-
-        const isDataAvailable = !!(user.name && user.username && user.password && user.userbiokey)
+    const onCreateUser = async() => {
+        const isDataAvailable = !!(user.name && user.username && user.password && user.userbiokey && user.Threshold)
         if (isDataAvailable) {
             Axios.post("http://localhost:3001/register", user)
-                .then(res => alert(res))
+                .then(res => alert("successful create"))
+            window.href = "/login"
         }
         else {
             alert("invalid input")
         };
+    }
+
+    //register function 
+    const handleRegister = (e) => {
+        e.preventDefault()
+
+        if (user.password.length > 7 && user.password.length < 11){ //8-10
+            user.Threshold = 20
+        } else if (user.password.length > 10 && user.password.length < 21){ //11-20
+            console.log("here");
+            user.Threshold = 30
+        } else if (user.password.length > 20 && user.password.length < 31){ //21-30
+            user.Threshold = 40
+        }
+        console.log(user.Threshold); 
+        onCreateUser()
     }
 
     return (
@@ -41,7 +56,7 @@ const Register = () => {
             </div>
             <span class="justify-center text-sm text-center flex-items-center text-gray-400">
                 Already have an account ?
-                <a href="/login" class="text-sm text-blue-500 underline hover:text-blue-700">
+                <a href="/" class="text-sm text-blue-500 underline hover:text-blue-700">
                     Sign in
                 </a>
             </span>
