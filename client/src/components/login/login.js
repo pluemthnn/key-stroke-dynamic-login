@@ -94,6 +94,7 @@ const Login = () => {
             if (axios.isAxiosError(err)) {
                 console.log({err});
                 alert(err.response.data.message);
+                console.log(user.userbiokey, " not match with existing biokey");
                 history.push("/")
             }
         }
@@ -101,7 +102,7 @@ const Login = () => {
 
     function handlelogin(e) {
         e.preventDefault()
-
+        console.log("handle login");
         let sum = keyevent.DU[keyevent.DU.length - 1];// dwel time
 
         for (let i = 0; i < keyevent.DD.length; i++) {
@@ -110,7 +111,7 @@ const Login = () => {
         let n = keyevent.DD.length + 1
         user.userbiokey = sum / n
 
-        console.log("user.userbiokey ", user.userbiokey);
+        console.log("userbiokey ", user.userbiokey);
         handleRegister(e)
     }
 
